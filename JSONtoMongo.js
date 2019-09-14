@@ -18,8 +18,46 @@ var fs = require('fs'),
   and then save it to your Mongo database 
   //see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
 
+
   Remember that we needed to read in a file like we did in Bootcamp Assignment #1.
  */
+
+function initMongoose() {
+  mongoose.connect(config.db.uri);
+  mongoose.set('useNewUrlParser', true);
+  mongoose.set('useFindAndModify', false);
+  mongoose.set('useCreateIndex', true);
+  mongoose.set('useUnifiedTopology', true);
+}
+
+function saveDone(err, entry) {
+  if (err)
+    console.log(err);
+  else
+    console.log(`Success saving ${entry}`);
+}
+
+function save(entry) {
+  new Listing(entry).save(saveDone);
+}
+
+function saveEntries(entries) {
+  entries.forEach(function(entry) {
+    save(entry);
+  });
+}
+
+fs.readFile('./listings.json', 'utf8', function(err, data) {
+  if (err) {
+    console.log(err);
+  } else {
+    initMongoose();
+
+    var jsonData = JSON.parse(data);
+    saveEntries(jsonData.entries);
+  }
+});
+
 
 
 /*  
